@@ -1,0 +1,38 @@
+name: CI Pipeline
+
+# Define when the workflow will be triggered
+on:
+  push:
+    branches:
+      - main  
+  pull_request:
+    branches:
+      - main  
+
+# Define the jobs that will be executed
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest 
+
+    steps:
+      # Step 1: Code checkout
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: .NET SDK setup
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x' 
+
+      # Step 3: Dependencies restore
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Step 4: Project build
+      - name: Build project
+        run: dotnet build --no-restore
+
+      # Step 5: Test execution
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal
