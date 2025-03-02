@@ -1,46 +1,67 @@
-public class RoverService
+// Commands interface
+public interface ICommand
 {
-    private List<(int X, int Y)> _occupiedPositions = new List<(int X, int Y)>();
+    void Execute(Rover rover, Plateau plateau, List<(int X, int Y)> occupiedPositions);
+}
 
-    public Rover MoveRover(Rover rover, Plateau plateau, string commands)
+// Command to turn left
+public class TurnLeftCommand : ICommand
+{
+    public void Execute(Rover rover, Plateau plateau, List<(int X, int Y)> occupiedPositions)
     {
-        foreach (var command in commands)
-        {
-            switch (command)
-            {
-                case 'L': rover.Direction = TurnLeft(rover.Direction); break;
-                case 'R': rover.Direction = TurnRight(rover.Direction); break;
-                case 'M': MoveForward(rover, plateau); break;
-            }
-        }
-        return rover;
-    }
-
-    private char TurnLeft(char direction)
-    {
-        return direction switch
+        rover.Direction = rover.Direction switch
         {
             'N' => 'W',
             'W' => 'S',
             'S' => 'E',
             'E' => 'N',
-            _ => direction
+            _ => rover.Direction
         };
     }
+}
 
-    private char TurnRight(char direction)
+// Command to turn right
+public class TurnRightCommand : ICommand
+{
+    public void Execute(Rover rover, Plateau plateau, List<(int X, int Y)> occupiedPositions)
     {
-        return direction switch
+        rover.Direction = rover.Direction switch
         {
             'N' => 'E',
             'E' => 'S',
             'S' => 'W',
             'W' => 'N',
-            _ => direction
+            _ => rover.Direction
         };
     }
+}
 
-    private void MoveForward(Rover rover, Plateau plateau)
+// Command to move forward
+public class MoveForwardCommand : ICommand
+{
+    private readonly IMovementStrategy _movementStrategy;
+
+    public MoveForwardCommand(IMovementStrategy movementStrategy)
+    {
+        _movementStrategy = movementStrategy;
+    }
+
+    public void Execute(Rover rover, Plateau plateau, List<(int X, int Y)> occupiedPositions)
+    {
+        _movementStrategy.Move(rover, plateau, occupiedPositions);
+    }
+}
+
+// Moviment strategy interface
+public interface IMovementStrategy
+{
+    void Move(Rover rover, Plateau plateau, List<(int X, int Y)> occupiedPositions);
+}
+
+// Default movement strategy
+public class StandardMovementStrategy : IMovementStrategy
+{
+    public void Move(Rover rover, Plateau plateau, List<(int X, int Y)> occupiedPositions)
     {
         int newX = rover.X;
         int newY = rover.Y;
@@ -66,14 +87,42 @@ public class RoverService
             throw new InvalidOperationException("Movimento inválido: Rover sairia do planalto.");
         }
 
-        if (_occupiedPositions.Contains((newX, newY)))
+        if (occupiedPositions.Contains((newX, newY)))
         {
             throw new InvalidOperationException("Movimento inválido: Posição já ocupada por outra sonda.");
         }
 
-        _occupiedPositions.Remove((rover.X, rover.Y));
+        occupiedPositions.Remove((rover.X, rover.Y));
         rover.X = newX;
         rover.Y = newY;
-        _occupiedPositions.Add((rover.X, rover.Y));
+        occupiedPositions.Add((rover.X, rover.Y));
+    }
+}
+
+public class RoverService
+{
+    private readonly List<(int X, int Y)> _occupiedPositions = new List<(int X, int Y)>();
+    private readonly IMovementStrategy _movementStrategy;
+
+    public RoverService(IMovementStrategy movementStrategy)
+    {
+        _movementStrategy = movementStrategy;
+    }
+
+    public Rover MoveRover(Rover rover, Plateau plateau, string commands)
+    {
+        foreach (var command in commands)
+        {
+            ICommand cmd = command switch
+            {
+                'L' => new TurnLeftCommand(),
+                'R' => new TurnRightCommand(),
+                'M' => new MoveForwardCommand(_movementStrategy),
+                _ => throw new ArgumentException("Comando inválido")
+            };
+
+            cmd.Execute(rover, plateau, _occupiedPositions);
+        }
+        return rover;
     }
 }

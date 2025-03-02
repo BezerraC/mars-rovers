@@ -1,6 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IMovementStrategy, StandardMovementStrategy>();
 builder.Services.AddSingleton<RoverService>();
 
 var app = builder.Build();
