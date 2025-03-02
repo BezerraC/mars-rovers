@@ -2,17 +2,28 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const RoverControl = () => {
-  const [rover, setRover] = useState({ x: 1, y: 2, direction: "N" });
-  const [plateau, setPlateau] = useState({ width: 5, height: 5 });
+  const [rover, setRover] = useState({ x: "1", y: "2", direction: "N" }); 
+  const [plateau, setPlateau] = useState({ width: "5", height: "5" }); 
   const [commands, setCommands] = useState("");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
   const handleMoveRover = async () => {
     try {
+      // Converts values ​​to numbers before sending
+      const roverData = {
+        x: parseInt(rover.x),
+        y: parseInt(rover.y),
+        direction: rover.direction,
+      };
+      const plateauData = {
+        width: parseInt(plateau.width),
+        height: parseInt(plateau.height),
+      };
+
       const response = await axios.post("http://localhost:5256/rover/move", {
-        rover,
-        plateau,
+        rover: roverData,
+        plateau: plateauData,
         commands,
       });
       setResult(response.data);
@@ -31,17 +42,27 @@ const RoverControl = () => {
         <label>
           Posição X:
           <input
-            type="number"
+            type="text" 
             value={rover.x}
-            onChange={(e) => setRover({ ...rover, x: parseInt(e.target.value) })}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setRover({ ...rover, x: value });
+              }
+            }}
           />
         </label>
         <label>
           Posição Y:
           <input
-            type="number"
+            type="text" 
             value={rover.y}
-            onChange={(e) => setRover({ ...rover, y: parseInt(e.target.value) })}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setRover({ ...rover, y: value });
+              }
+            }}
           />
         </label>
         <label>
@@ -62,17 +83,27 @@ const RoverControl = () => {
         <label>
           Largura:
           <input
-            type="number"
+            type="text" 
             value={plateau.width}
-            onChange={(e) => setPlateau({ ...plateau, width: parseInt(e.target.value) })}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setPlateau({ ...plateau, width: value });
+              }
+            }}
           />
         </label>
         <label>
           Altura:
           <input
-            type="number"
+            type="text" 
             value={plateau.height}
-            onChange={(e) => setPlateau({ ...plateau, height: parseInt(e.target.value) })}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setPlateau({ ...plateau, height: value });
+              }
+            }}
           />
         </label>
       </div>
