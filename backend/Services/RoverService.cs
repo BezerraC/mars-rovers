@@ -82,19 +82,27 @@ public class StandardMovementStrategy : IMovementStrategy
                 break;
         }
 
+        // Check if the movement is within the plateau boundaries
         if (newX < 0 || newX > plateau.Width || newY < 0 || newY > plateau.Height)
         {
             throw new InvalidOperationException("Movimento inválido: Rover sairia do planalto.");
         }
 
+        // Check if the new position is already occupied by another rover
         if (occupiedPositions.Contains((newX, newY)))
         {
             throw new InvalidOperationException("Movimento inválido: Posição já ocupada por outra sonda.");
         }
 
+        // Debugging: Remove previous position before updating
+        // Identified during debugging that the previous position was not being removed
         occupiedPositions.Remove((rover.X, rover.Y));
+
+        // Updates rover position
         rover.X = newX;
         rover.Y = newY;
+
+        // Adds the new position to the list of occupied positions
         occupiedPositions.Add((rover.X, rover.Y));
     }
 }
