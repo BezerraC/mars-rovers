@@ -119,7 +119,7 @@ public class RoverService
 
     public Rover MoveRover(Rover rover, Plateau plateau, string commands)
     {
-        _occupiedPositions.Add((rover.X, rover.Y));
+        _occupiedPositions.Remove((rover.X, rover.Y));
 
         foreach (var command in commands)
         {
@@ -133,6 +133,9 @@ public class RoverService
 
             cmd.Execute(rover, plateau, _occupiedPositions);
         }
+
+        _occupiedPositions.Add((rover.X, rover.Y));
+
         return rover;
     }
 }
