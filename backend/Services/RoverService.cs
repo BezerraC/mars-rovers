@@ -1,7 +1,7 @@
-using System.ComponentModel;
-
 public class RoverService
 {
+    private List<(int X, int Y)> _occupiedPositions = new List<(int X, int Y)>();
+
     public Rover MoveRover(Rover rover, Plateau plateau, string commands)
     {
         foreach (var command in commands)
@@ -42,32 +42,38 @@ public class RoverService
 
     private void MoveForward(Rover rover, Plateau plateau)
     {
+        int newX = rover.X;
+        int newY = rover.Y;
+
         switch (rover.Direction)
         {
             case 'N':
-                if (rover.Y < plateau.Height)
-                {
-                    rover.Y++;
-                }
+                newY = rover.Y + 1;
                 break;
             case 'E':
-                if (rover.X < plateau.Width)
-                {
-                    rover.X++;
-                }
+                newX = rover.X + 1;
                 break;
             case 'S':
-                if (rover.Y > 0)
-                {
-                    rover.Y--;
-                }
+                newY = rover.Y - 1;
                 break;
             case 'W':
-                if (rover.X > 0)
-                {
-                    rover.X--;
-                }
+                newX = rover.X - 1;
                 break;
         }
+
+        if (newX < 0 || newX > plateau.Width || newY < 0 || newY > plateau.Height)
+        {
+            throw new InvalidOperationException("Movimento inválido: Rover sairia do planalto.");
+        }
+
+        if (_occupiedPositions.Contains((newX, newY)))
+        {
+            throw new InvalidOperationException("Movimento inválido: Posição já ocupada por outra sonda.");
+        }
+
+        _occupiedPositions.Remove((rover.X, rover.Y));
+        rover.X = newX;
+        rover.Y = newY;
+        _occupiedPositions.Add((rover.X, rover.Y));
     }
 }
