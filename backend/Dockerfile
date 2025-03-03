@@ -1,24 +1,11 @@
-# Use the .NET 9 SDK base image to build the project
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
-
-# Copy the project files and restore dependencies
-COPY backend.csproj .
-RUN dotnet restore
-
-# Copy the rest of the code and build the project
-COPY . .
-RUN dotnet publish -c Release -o /app
-
-# Use the .NET 9 Runtime base image to run the project
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+# Use the SDK image for development and debugging
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dev
 WORKDIR /app
 
-# Copy the compiled files from the build stage
-COPY --from=build /app .
+# Copy the project file and restore the dependencies
+COPY . .
 
-# This is the port that the backend listens on
 EXPOSE 5256
 
-# Define the command to run the backend
-ENTRYPOINT ["dotnet", "backend.dll"]
+# Execute the application with the watch command to enable hot reload
+ENTRYPOINT ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5256"]
