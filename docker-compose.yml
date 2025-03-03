@@ -9,6 +9,9 @@ services:
       - "5256:5256" 
     environment:
       - ASPNETCORE_URLS=http://+:5256
+      - DOTNET_USE_POLLING_FILE_WATCHER=1   # For hot reload to work well in Docker
+    volumes:
+      - ./backend:/app
     networks:
       - mars-network
 
