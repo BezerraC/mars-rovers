@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Attach to Docker (Backend)",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "1",
+        "pipeTransport": {
+          "pipeProgram": "docker",
+          "pipeArgs": [
+            "exec",
+            "-i",
+            "mars-rovers-backend-1",
+            "/usr/share/dotnet/dotnet",
+            "watch",
+            "run",
+            "--urls",
+            "http://0.0.0.0:5257"
+          ],
+          "debuggerPath": "/usr/share/dotnet/dotnet"
+        }
+      }
+    ]
+  }
+  
