@@ -1,4 +1,5 @@
 # Mars Rovers - Explorando Marte
+[![screencapture-localhost-3000-2025-03-03-12-13-23.png](https://i.postimg.cc/SxNjmYKV/screencapture-localhost-3000-2025-03-03-12-13-23.png)](https://postimg.cc/YhZt39Ym)
 Este projeto simula o controle de rovers em um planalto marciano. Os rovers recebem comandos para se moverem, seguindo instruções de controle. O projeto é composto por uma Web API em .NET para o backend e um frontend em React para a interface do usuário.
 
 ## Problema
