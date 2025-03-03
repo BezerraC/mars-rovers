@@ -119,9 +119,58 @@ cd backend.Tests
 dotnet test
 ```
 
+## Debugging e Troubleshooting
+Durante o desenvolvimento deste projeto, utilizei as ferramentas de debugging do VSCode para investigar problemas relacionados ao movimento dos rovers, especialmente na parte que envolve a atualização das posições e a verificação de colisões.
+
+### Exemplo de Debugging no Código
+No código da classe `StandardMovementStrategy`, identifiquei que o método Move não estava removendo a posição anterior do rover corretamente. Isso foi detectado ao inspecionar a lista `occupiedPositions` durante a execução, e adicionei um código de debugging logo após a movimentação para garantir que a posição anterior fosse removida antes de atualizar a nova posição:
+
+```
+// Debugging: Remove previous position before updating
+// Identified during debugging that the previous position was not being removed
+occupiedPositions.Remove((rover.X, rover.Y));
+```
+
+Esse passo foi essencial para corrigir o comportamento do sistema, pois permitiu que as posições dos rovers fossem atualizadas corretamente na lista de ocupação.
+
+### Configuração do launch.json
+Para facilitar o processo de debugging, configurei o arquivo launch.json no VSCode para garantir que o ambiente de execução fosse corretamente configurado para a depuração do código .NET. O arquivo launch.json foi configurado da seguinte maneira:
+
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Attach to Docker (Backend)",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "1",
+        "pipeTransport": {
+          "pipeProgram": "docker",
+          "pipeArgs": [
+            "exec",
+            "-i",
+            "mars-rovers-backend-1",
+            "/usr/share/dotnet/dotnet",
+            "watch",
+            "run",
+            "--urls",
+            "http://0.0.0.0:5257"
+          ],
+          "debuggerPath": "/usr/share/dotnet/dotnet"
+        }
+      }
+    ]
+  }
+```
+
+Essa configuração garante que o VSCode possa iniciar o backend .NET corretamente e me permitir depurar a aplicação sem problemas.
+
 ## Considerações Finais
 Extensibilidade: O uso de Design Patterns como Command e Strategy permite que o projeto seja facilmente estendido no futuro.
 
 CI/CD: A integração contínua com GitHub Actions garante que o código seja sempre testado e validado antes de ser integrado à branch principal.
 
 Containerização: O uso de Docker facilita a execução do projeto em qualquer ambiente, garantindo consistência entre desenvolvimento e produção.
+
+Debugging e Troubleshooting: Durante o desenvolvimento, foram feitas diversas investigações e correções utilizando ferramentas de debugging, como as do VSCode, para resolver problemas críticos, como a atualização das posições dos rovers e a verificação de colisões. A utilização de um arquivo [launch.json](.vscode/launch.json) também garantiu que o ambiente de desenvolvimento fosse otimizado para o processo de depuração.
